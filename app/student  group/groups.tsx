@@ -45,6 +45,22 @@ const filteredGroups = groups.filter((group) =>
   group.name.toLowerCase().includes(search.toLowerCase())
 )
 
+const getStudentsByGroup = async (groupId: number) => {
+  setSelectedGroupId(groupId)
+
+  const { data, error } = await supabase
+    .from("students")
+    .select("*")
+    .eq("group_id", groupId)
+    .order("id", { ascending: true })
+
+  if (error) {
+    console.log("O'quvchilarni olishda xatolik:", error)
+    return
+  }
+
+  setStudents(data || [])
+}
   return (
     <div>
         <main className="min-h-screen bg-slate-100 p-8">
@@ -76,7 +92,7 @@ const filteredGroups = groups.filter((group) =>
   {filteredGroups.map((group) => (
     <div
       key={group.id}
-     onClick={() => setSelectedGroupId(group.id)}
+     onClick={() => getStudentsByGroup(group.id)}
       className={`cursor-pointer rounded-3xl border bg-white p-8 shadow-sm ${
         selectedGroupId === group.id ? "border-blue-400" : "border-slate-200"
       }`}
