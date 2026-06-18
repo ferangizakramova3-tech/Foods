@@ -38,7 +38,13 @@ const getGroups = async () => {
   }
 
   setGroups(data || [])
+
+
 }
+const filteredGroups = groups.filter((group) =>
+  group.name.toLowerCase().includes(search.toLowerCase())
+)
+
   return (
     <div>
         <main className="min-h-screen bg-slate-100 p-8">
@@ -65,6 +71,38 @@ const getGroups = async () => {
     </div>
   </div>
 </main>
+
+<div className="mb-8 grid grid-cols-3 gap-6">
+  {filteredGroups.map((group) => (
+    <div
+      key={group.id}
+     onClick={() => setSelectedGroupId(group.id)}
+      className={`cursor-pointer rounded-3xl border bg-white p-8 shadow-sm ${
+        selectedGroupId === group.id ? "border-blue-400" : "border-slate-200"
+      }`}
+    >
+      <h2 className="text-center text-4xl font-bold">{group.name}</h2>
+
+      <p className="mt-2 text-center text-xl text-slate-500">
+        students
+      </p>
+
+      <div className="mt-6 flex justify-end">
+        <div
+          className={`h-8 w-14 rounded-full p-1 ${
+            group.active ? "bg-blue-500" : "bg-slate-300"
+          }`}
+        >
+          <div
+            className={`h-6 w-6 rounded-full bg-white ${
+              group.active ? "ml-6" : ""
+            }`}
+          />
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
     </div>
   )
 }
