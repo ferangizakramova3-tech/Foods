@@ -119,6 +119,36 @@ const getStudentsByGroup = async (groupId: number) => {
     </div>
   ))}
 </div>
+<table className="w-full">
+  <thead>
+    <tr>
+      <th className="p-4 text-left">N°</th>
+      <th className="p-4 text-left">Fullname</th>
+      <th className="p-4 text-left">Age</th>
+      <th className="p-4 text-left">Email</th>
+      <th className="p-4 text-left">Active</th>
+      <th className="p-4 text-left">Actions</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {students.map((student, index) => (
+      <tr key={student.id}>
+        <td className="p-4">{index + 1}</td>
+        <td className="p-4">{student.fullname}</td>
+        <td className="p-4">{student.age}</td>
+        <td className="p-4">{student.email}</td>
+        <td className="p-4">
+          <input type="checkbox" checked={student.active} readOnly />
+        </td>
+        <td className="p-4">
+          <button className="mr-3 text-red-500">Delete</button>
+          <button className="text-blue-500">Edit</button>
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
     </div>
   )
 }
