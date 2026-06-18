@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
-
+import Rodal from "rodal"
+import "rodal/lib/rodal.css"
 type Group = {
   id: number
   name: string
@@ -25,7 +26,11 @@ const [groups, setGroups] = useState<Group[]>([])
 const [students, setStudents] = useState<Student[]>([])
 const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null)
 const [search, setSearch] = useState("")
-
+const [studentModalOpen, setStudentModalOpen] = useState(false)
+const [fullname, setFullname] = useState("")
+const [age, setAge] = useState("")
+const [email, setEmail] = useState("")
+const [active, setActive] = useState(false)
 useEffect(() => {
   getGroups()
 }, [])
@@ -62,7 +67,39 @@ const getStudentsByGroup = async (groupId: number) => {
 
   setStudents(data || [])
 }
+const addStudent = async () => {
+  if (!selectedGroupId) {
+    alert("Avval guruh tanlang")
+    return
+  }
 
+  const { data, error } = await supabase
+    .from("students")
+    .insert([
+      {
+        fullname: fullname,
+        age: Number(age),
+        email: email,
+        active: active,
+        group_id: selectedGroupId,
+      },
+    ])
+    .select()
+    .single()
+
+  if (error) {
+    console.log("O'quvchi qo'shishda xatolik:", error)
+    return
+  }
+
+  setStudents([...students, data])
+
+  setFullname("")
+  setAge("")
+  setEmail("")
+  setActive(false)
+  setStudentModalOpen(false)
+}
 const addGroup = async () => {
   const { data, error } = await supabase
     .from("groups")
@@ -170,27 +207,103 @@ const addGroup = async () => {
     ))}
   </tbody>
 </table>
-{groupModalOpen && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black/40">
-    <div className="w-96 rounded-2xl bg-white p-6">
-      <h2 className="mb-4 text-2xl font-bold">Add group</h2>
+<Rodal
+  visible={groupModalOpen}
+  onClose={() => setGroupModalOpen(false)}
+  width={420}
+  height={240}
+  customStyles={{
+    borderRadius: "20px",
+    padding: "0",
+  }}
+>
+  <div className="p-6">
+    <h2 className="mb-4 text-2xl font-bold">Add group</h2>
 
-      <input
-        placeholder="Group name"
-        value={groupName}
-        onChange={(e) => setGroupName(e.target.value)}
-        className="mb-4 w-full rounded-xl border px-4 py-3"
-      />
+    <input
+      placeholder="Group name"
+      value={groupName}
+      onChange={(e) => setGroupName(e.target.value)}
+      className="mb-4 w-full rounded-xl border px-4 py-3"
+    />
+
+    <div className="flex gap-3">
+      <button
+        onClick={() => setGroupModalOpen(false)}
+        className="flex-1 rounded-xl border py-3"
+      >
+        Cancel
+      </button>
 
       <button
         onClick={addGroup}
-        className="rounded-xl bg-black px-5 py-3 text-white"
+        className="flex-1 rounded-xl bg-black py-3 text-white"
       >
         Save
       </button>
     </div>
   </div>
-)}
+</Rodal>
+<Rodal
+  visible={studentModalOpen}
+  onClose={() => setStudentModalOpen(false)}
+  width={430}
+  height={430}
+  customStyles={{
+    borderRadius: "20px",
+    padding: "0",
+  }}
+>
+  <div className="p-6">
+    <h2 className="mb-4 text-2xl font-bold">Add student</h2>
+
+    <input
+      placeholder="Fullname"
+      value={fullname}
+      onChange={(e) => setFullname(e.target.value)}
+      className="mb-3 w-full rounded-xl border px-4 py-3"
+    />
+
+    <input
+      placeholder="Age"
+      value={age}
+      onChange={(e) => setAge(e.target.value)}
+      className="mb-3 w-full rounded-xl border px-4 py-3"
+    />
+
+    <input
+      placeholder="Email"
+      value={email}
+      onChange={(e) => setEmail(e.target.value)}
+      className="mb-3 w-full rounded-xl border px-4 py-3"
+    />
+
+    <label className="mb-4 flex items-center gap-2">
+      <input
+        type="checkbox"
+        checked={active}
+        onChange={(e) => setActive(e.target.checked)}
+      />
+      Active
+    </label>
+
+    <div className="flex gap-3">
+      <button
+        onClick={() => setStudentModalOpen(false)}
+        className="flex-1 rounded-xl border py-3"
+      >
+        Cancel
+      </button>
+
+      <button
+        onClick={addStudent}
+        className="flex-1 rounded-xl bg-black py-3 text-white"
+      >
+        Save
+      </button>
+    </div>
+  </div>
+</Rodal>
     </div>
   )
 }
